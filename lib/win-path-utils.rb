@@ -93,14 +93,14 @@ module WinPathUtils
     end
 
     # Adds element to the end of the path if not exists
-    def push(value)
-      add(value, where: :end)
+    def push(value, options = {})
+      add(value, options.merge(where: :end))
     end
     alias_method :append, :push
 
     # Adds element to the start of the path if not exists
-    def unshift(value)
-      add(value, where: :start)
+    def unshift(value, options = {})
+      add(value, options.merge(where: :start))
     end
     alias_method :prepend, :unshift
 
