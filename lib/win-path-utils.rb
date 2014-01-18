@@ -5,6 +5,7 @@ require "win32/registry"
 module WinPathUtils
   class Path
     class WrongOptionError < StandardError; end
+    class SetxError < StandardError; end
 
     def initialize(options = {})
       @separator = options[:separator] || ';'
@@ -117,6 +118,25 @@ module WinPathUtils
       get_array.include?(value)
     end
     alias_method :member?, :include?
+
+    # Cause Windows to reload environment from registry
+    def self.commit!
+      var = "WIN_PATH_UTILS_TMPVAR"
+
+      fd_r, fd_w = IO.pipe
+      result = system("setx", var, "", [:out, :err] => fd_w)
+      fd_w.close
+      output = fd_r.read
+
+      raise SetxError.new("SETX error: #{output}") if result == false
+
+      result
+    end
+
+    # Alias
+    def commit!
+      self.class.commit!
+    end
 
     private
 
